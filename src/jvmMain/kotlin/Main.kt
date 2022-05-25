@@ -58,6 +58,7 @@ import org.jetbrains.skia.Image
 import socket.Socket
 import socket.model.artistNames
 import socket.model.coverArt
+import util.loadItem
 
 
 @Composable
@@ -120,24 +121,10 @@ fun main() {
     val audioPlayer: AudioPlayer = playerManager.createPlayer()
     val trackScheduler = TrackScheduler(audioPlayer)
     audioPlayer.addListener(trackScheduler)
-    playerManager.loadItem("https://listen.moe/m3u8/jpop.m3u", object : AudioLoadResultHandler {
-        override fun trackLoaded(track: AudioTrack) {
-            trackScheduler.queue(track)
-        }
-
-        override fun playlistLoaded(playlist: AudioPlaylist) {
-
-        }
-
-        override fun noMatches() {
-
-        }
-
-        override fun loadFailed(exception: FriendlyException) {
-
-        }
-
-    })
+    playerManager.loadItem(
+        "https://listen.moe/m3u8/jpop.m3u",
+        onTrackLoaded = { trackScheduler.queue(it) }
+    )
     GlobalScope.launch(Dispatchers.IO) {
         val format: AudioDataFormat = playerManager.configuration.outputFormat
         val stream = AudioPlayerInputStream.createStream(audioPlayer, format, 10000L, false)
@@ -154,6 +141,7 @@ fun main() {
             line.write(buffer, 0, chunkSize)
         }
     }
+    val component = DaggerDataComponent.create()
 
     application {
         Window(
@@ -162,7 +150,6 @@ fun main() {
             onCloseRequest = ::exitApplication,
             resizable = false
         ) {
-            val component = DaggerDataComponent.create()
             App(component.socket)
         }
     }
