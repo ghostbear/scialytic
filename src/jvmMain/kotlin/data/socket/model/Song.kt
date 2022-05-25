@@ -1,11 +1,11 @@
-package socket.model
+package data.socket.model
 
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LastPlayed(
+data class Song(
     @SerialName("id")
     val id: Int = 0,
     @SerialName("title")
@@ -21,3 +21,14 @@ data class LastPlayed(
     @SerialName("duration")
     val duration: Int = 0
 )
+
+val Song.coverArt: String
+    get() {
+        val image = albums.firstNotNullOfOrNull(Album::image) ?: return "https://listen.moe/_nuxt/img/blank-dark.cd1c044.png"
+        return "https://cdn.listen.moe/covers/${image}"
+    }
+
+val Song.artistNames: String
+    get() {
+        return artists.joinToString(", ", transform = Artist::name)
+    }

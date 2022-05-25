@@ -1,4 +1,4 @@
-package socket
+package data.socket
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket
@@ -21,8 +21,8 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import socket.model.CurrentlyPlaying
-import socket.model.Message
+import data.socket.model.CurrentlyPlaying
+import data.socket.model.Message
 
 class Socket @Inject constructor(
     private val json: Json,

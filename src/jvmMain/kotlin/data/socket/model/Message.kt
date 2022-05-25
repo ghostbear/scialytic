@@ -1,4 +1,4 @@
-package socket.model
+package data.socket.model
 
 
 import kotlinx.serialization.SerialName

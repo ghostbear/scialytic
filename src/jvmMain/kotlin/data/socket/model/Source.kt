@@ -1,17 +1,17 @@
-package socket.model
+package data.socket.model
 
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Album(
+data class Source(
     @SerialName("id")
     val id: Int = 0,
     @SerialName("name")
     val name: String = "",
     @SerialName("nameRomaji")
-    val nameRomaji: String? = null,
+    val nameRomaji: String? = "",
     @SerialName("image")
     val image: String? = ""
 )

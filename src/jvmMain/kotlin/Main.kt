@@ -25,25 +25,20 @@ import androidx.compose.ui.window.rememberWindowState
 import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat
 import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream
 import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats.COMMON_PCM_S16_BE
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
-import dagger.Component
-import dagger.Module
-import dagger.Provides
+import data.socket.Socket
+import data.socket.model.artistNames
+import data.socket.model.coverArt
+import di.DaggerDataComponent
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toByteArray
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
@@ -53,11 +48,7 @@ import javax.sound.sampled.SourceDataLine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.jetbrains.skia.Image
-import socket.Socket
-import socket.model.artistNames
-import socket.model.coverArt
 import util.loadItem
 
 
@@ -177,29 +168,4 @@ class TrackScheduler(
     }
 }
 
-@Module
-object DataModule {
 
-    @Provides
-    fun provideJson(): Json {
-        return Json {
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
-    }
-
-    @Provides
-    fun provideHttpClient(json: Json): HttpClient {
-        return HttpClient {
-            install(WebSockets)
-            install(ContentNegotiation) {
-                json(json)
-            }
-        }
-    }
-}
-
-@Component(modules = [DataModule::class])
-interface DataComponent {
-    val socket: Socket
-}
