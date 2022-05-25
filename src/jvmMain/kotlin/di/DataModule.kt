@@ -1,9 +1,7 @@
 package di
 
-import dagger.Component
 import dagger.Module
 import dagger.Provides
-import data.socket.Socket
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.WebSockets
@@ -30,9 +28,4 @@ object DataModule {
             }
         }
     }
-}
-
-@Component(modules = [DataModule::class])
-interface DataComponent {
-    val socket: Socket
 }

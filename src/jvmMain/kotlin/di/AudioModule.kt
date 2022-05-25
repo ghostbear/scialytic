@@ -1,13 +1,10 @@
 package di
 
-import audio.RadioPlayer
-import audio.RadioScheduler
 import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import dagger.Component
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -32,13 +29,4 @@ object AudioModule {
         return playerManager.createPlayer()
     }
 
-}
-
-@Singleton
-@Component(modules = [AudioModule::class])
-interface AudioComponent {
-    val playerManager: AudioPlayerManager
-    val audioPlayer: AudioPlayer
-    val radioScheduler: RadioScheduler
-    val radioPlayer: RadioPlayer
 }

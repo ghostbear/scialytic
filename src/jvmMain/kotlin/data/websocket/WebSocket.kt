@@ -1,16 +1,15 @@
-package data.socket
+package data.websocket
 
+import data.websocket.model.CurrentlyPlaying
+import data.websocket.model.Message
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.plugins.websocket.wss
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
-import java.io.InputStream
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -18,13 +17,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import data.socket.model.CurrentlyPlaying
-import data.socket.model.Message
 
-class Socket @Inject constructor(
+class WebSocket @Inject constructor(
     private val json: Json,
     private val webSocketClient: HttpClient
 ) {

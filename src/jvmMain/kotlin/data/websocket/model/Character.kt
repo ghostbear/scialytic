@@ -1,11 +1,11 @@
-package data.socket.model
+package data.websocket.model
 
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Album(
+data class Character(
     @SerialName("id")
     val id: Int = 0,
     @SerialName("name")
@@ -13,5 +13,5 @@ data class Album(
     @SerialName("nameRomaji")
     val nameRomaji: String? = null,
     @SerialName("image")
-    val image: String? = ""
+    val image: String? = null
 )

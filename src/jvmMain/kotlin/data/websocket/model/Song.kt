@@ -1,4 +1,4 @@
-package data.socket.model
+package data.websocket.model
 
 
 import kotlinx.serialization.SerialName
