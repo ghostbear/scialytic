@@ -22,14 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import audio.TrackScheduler
-import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat
-import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream
-import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats.COMMON_PCM_S16_BE
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import data.socket.Socket
 import data.socket.model.artistNames
 import data.socket.model.coverArt
@@ -39,12 +31,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.toByteArray
-import javax.sound.sampled.AudioSystem
-import javax.sound.sampled.DataLine
-import javax.sound.sampled.SourceDataLine
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 import util.loadItem
 
@@ -105,29 +91,12 @@ fun imageFromString(stringUrl: String): State<ImageBitmap?> {
 fun main() {
     val dataComponent = DaggerDataComponent.create()
     val audioComponent = DaggerAudioComponent.create()
-
-
     audioComponent.audioPlayer.addListener(audioComponent.trackScheduler)
     audioComponent.playerManager.loadItem(
         "https://listen.moe/opus",
         onTrackLoaded = { audioComponent.trackScheduler.queue(it) }
     )
-    GlobalScope.launch(Dispatchers.IO) {
-        val format: AudioDataFormat = audioComponent.playerManager.configuration.outputFormat
-        val stream = AudioPlayerInputStream.createStream(audioComponent.audioPlayer, format, 10000L, false)
-        val info = DataLine.Info(SourceDataLine::class.java, stream.format)
-        val line = AudioSystem.getLine(info) as SourceDataLine
-
-        line.open(stream.format)
-        line.start()
-
-        val buffer = ByteArray(COMMON_PCM_S16_BE.maximumChunkSize())
-        var chunkSize: Int
-
-        while (stream.read(buffer).also { chunkSize = it } >= 0) {
-            line.write(buffer, 0, chunkSize)
-        }
-    }
+    audioComponent.radioPlayer.play()
 
     application {
         Window(
