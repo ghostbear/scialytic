@@ -16,6 +16,7 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://m2.dv8tion.net/releases")
 }
 
 kotlin {
@@ -53,7 +54,7 @@ kotlin {
 
                 implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 
-                implementation("com.alialbaali.kamel:kamel-image:0.3.0")
+                implementation("com.sedmelluq:lavaplayer:1.3.78")
             }
         }
         val jvmTest by getting
