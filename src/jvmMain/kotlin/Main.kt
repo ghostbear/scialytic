@@ -22,26 +22,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import audio.TrackScheduler
 import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat
 import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream
 import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats.COMMON_PCM_S16_BE
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import data.socket.Socket
 import data.socket.model.artistNames
 import data.socket.model.coverArt
+import di.DaggerAudioComponent
 import di.DaggerDataComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.toByteArray
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.LinkedBlockingQueue
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
@@ -106,19 +103,18 @@ fun imageFromString(stringUrl: String): State<ImageBitmap?> {
 }
 
 fun main() {
-    val playerManager: AudioPlayerManager = DefaultAudioPlayerManager()
-    AudioSourceManagers.registerRemoteSources(playerManager)
-    playerManager.configuration.outputFormat = COMMON_PCM_S16_BE;
-    val audioPlayer: AudioPlayer = playerManager.createPlayer()
-    val trackScheduler = TrackScheduler(audioPlayer)
-    audioPlayer.addListener(trackScheduler)
-    playerManager.loadItem(
+    val dataComponent = DaggerDataComponent.create()
+    val audioComponent = DaggerAudioComponent.create()
+
+
+    audioComponent.audioPlayer.addListener(audioComponent.trackScheduler)
+    audioComponent.playerManager.loadItem(
         "https://listen.moe/opus",
-        onTrackLoaded = { trackScheduler.queue(it) }
+        onTrackLoaded = { audioComponent.trackScheduler.queue(it) }
     )
     GlobalScope.launch(Dispatchers.IO) {
-        val format: AudioDataFormat = playerManager.configuration.outputFormat
-        val stream = AudioPlayerInputStream.createStream(audioPlayer, format, 10000L, false)
+        val format: AudioDataFormat = audioComponent.playerManager.configuration.outputFormat
+        val stream = AudioPlayerInputStream.createStream(audioComponent.audioPlayer, format, 10000L, false)
         val info = DataLine.Info(SourceDataLine::class.java, stream.format)
         val line = AudioSystem.getLine(info) as SourceDataLine
 
@@ -132,7 +128,6 @@ fun main() {
             line.write(buffer, 0, chunkSize)
         }
     }
-    val component = DaggerDataComponent.create()
 
     application {
         Window(
@@ -141,29 +136,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             resizable = false
         ) {
-            App(component.socket)
-        }
-    }
-}
-
-class TrackScheduler(
-    private val audioPlayer: AudioPlayer
-) : AudioEventAdapter() {
-    private val queue: BlockingQueue<AudioTrack> = LinkedBlockingQueue()
-
-    fun queue(audioTrack: AudioTrack) {
-        if (!audioPlayer.startTrack(audioTrack, true)) {
-            queue.offer(audioTrack)
-        }
-    }
-
-    fun nextTrack() {
-        audioPlayer.startTrack(queue.poll(), false)
-    }
-
-    override fun onTrackEnd(player: AudioPlayer, track: AudioTrack, endReason: AudioTrackEndReason) {
-        if (endReason.mayStartNext) {
-            nextTrack()
+            App(dataComponent.socket)
         }
     }
 }
