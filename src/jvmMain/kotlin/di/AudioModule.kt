@@ -1,7 +1,7 @@
 package di
 
 import audio.RadioPlayer
-import audio.TrackScheduler
+import audio.RadioScheduler
 import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
@@ -39,6 +39,6 @@ object AudioModule {
 interface AudioComponent {
     val playerManager: AudioPlayerManager
     val audioPlayer: AudioPlayer
-    val trackScheduler: TrackScheduler
+    val radioScheduler: RadioScheduler
     val radioPlayer: RadioPlayer
 }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Singleton
 class RadioPlayer @Inject constructor(
@@ -42,8 +43,10 @@ class RadioPlayer @Inject constructor(
         var chunkSize: Int
 
         job = CoroutineScope(Job() + Dispatchers.IO).launch {
-            while (stream.read(buffer).also { chunkSize = it } >= 0) {
-                line?.write(buffer, 0, chunkSize)
+            withContext(Dispatchers.IO) {
+                while (stream.read(buffer).also { chunkSize = it } >= 0) {
+                    line?.write(buffer, 0, chunkSize)
+                }
             }
         }
     }
@@ -52,6 +55,14 @@ class RadioPlayer @Inject constructor(
         job?.cancel()
         job = null
         line?.close()
+    }
+
+    fun toggle() {
+        if (isPlaying()) {
+            pause()
+        } else {
+            play()
+        }
     }
 
 }

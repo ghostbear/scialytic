@@ -29,12 +29,17 @@ class Socket @Inject constructor(
     private val webSocketClient: HttpClient
 ) {
 
+    private var heartbeat: Job? = null
+    private var currentJob: Job? = null
+
     private val _currentlyPlaying: MutableSharedFlow<CurrentlyPlaying> = MutableSharedFlow()
     val currentlyPlaying: SharedFlow<CurrentlyPlaying> = _currentlyPlaying.asSharedFlow()
 
-    suspend fun connect() {
-        webSocketClient.wss("wss://listen.moe/gateway_v2") {
-            var heartbeat: Job? = null
+    suspend fun connect(urlString: String) {
+        heartbeat?.cancel()
+        currentJob?.cancel()
+        webSocketClient.wss(urlString) {
+
             launch {
                 try {
                     for (event in incoming) {
@@ -69,11 +74,12 @@ class Socket @Inject constructor(
                     println("Error while receiving: " + e.localizedMessage)
                 }
             }
-            launch {
+            currentJob = launch {
                 while (true) {
                     delay(1000)
                 }
-            }.join()
+            }
+            currentJob?.join()
         }
     }
 }
