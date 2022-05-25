@@ -122,7 +122,7 @@ fun main() {
     val trackScheduler = TrackScheduler(audioPlayer)
     audioPlayer.addListener(trackScheduler)
     playerManager.loadItem(
-        "https://listen.moe/m3u8/jpop.m3u",
+        "https://listen.moe/opus",
         onTrackLoaded = { trackScheduler.queue(it) }
     )
     GlobalScope.launch(Dispatchers.IO) {
