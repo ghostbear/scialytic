@@ -7,6 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import audio.RadioPlayer
 import data.socket.Socket
 import data.socket.model.artistNames
 import data.socket.model.coverArt
@@ -37,7 +39,7 @@ import util.loadItem
 
 @Composable
 @Preview
-fun App(socket: Socket) {
+fun App(socket: Socket, radioPlayer: RadioPlayer) {
     val currentlyPlaying by socket.currentlyPlaying.collectAsState(null)
     MaterialTheme {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -59,9 +61,20 @@ fun App(socket: Socket) {
                     style = MaterialTheme.typography.subtitle1
                 )
                 FloatingActionButton(
-                    onClick = {}
+                    onClick = {
+                        if (radioPlayer.isPlaying()) {
+                            radioPlayer.pause()
+                        } else {
+                            radioPlayer.play()
+                        }
+                    }
                 ) {
-                    Icon(Icons.Filled.PlayArrow, "")
+                    val icon = if (radioPlayer.isPlaying()) {
+                        Icons.Filled.Clear
+                    } else {
+                        Icons.Filled.PlayArrow
+                    }
+                    Icon(icon, "")
                 }
             }
         }
@@ -96,7 +109,8 @@ fun main() {
         "https://listen.moe/opus",
         onTrackLoaded = { audioComponent.trackScheduler.queue(it) }
     )
-    audioComponent.radioPlayer.play()
+    val radioPlayer = audioComponent.radioPlayer
+    radioPlayer.play()
 
     application {
         Window(
@@ -105,7 +119,10 @@ fun main() {
             onCloseRequest = ::exitApplication,
             resizable = false
         ) {
-            App(dataComponent.socket)
+            App(
+                dataComponent.socket,
+                radioPlayer
+            )
         }
     }
 }
