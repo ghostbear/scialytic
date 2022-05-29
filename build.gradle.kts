@@ -17,6 +17,7 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://m2.dv8tion.net/releases")
+    maven("https://jitpack.io")
 }
 
 kotlin {
@@ -55,6 +56,8 @@ kotlin {
                 implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 
                 implementation("com.sedmelluq:lavaplayer:1.3.78")
+
+                implementation("com.github.Vatuu:discord-rpc:1.6.2")
             }
         }
         val jvmTest by getting
